@@ -1,4 +1,4 @@
-import {getImagesByQuery} from './js/pixabay'
+import {getImagesByQuery} from './js/pixabay-api'
 import { showLoader,hideLoader } from './js/render-functions'
 
 const form = document.querySelector('.form')

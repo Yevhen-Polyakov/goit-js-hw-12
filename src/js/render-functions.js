@@ -3,16 +3,16 @@ import SimpleLightbox from "simplelightbox";
 // Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
 
-
-const loader = document.querySelector('.loader')
+const list = document.querySelector('.gallery');
+const loader = document.querySelector('.loader');
 
 const lightbox = new SimpleLightbox('.gallery-link', {
     captions: true,
     captionDelay: 250,
-})
+});
  
 export function createGallery(images){
-   return images.map(({webformatURL, 
+    const markup = images.map(({webformatURL, 
     largeImageURL, 
     tags, 
     likes, 
@@ -42,23 +42,20 @@ export function createGallery(images){
                     </div> 
                 </div>   
             </li>`
-    }).join("") 
+    }).join("");
 
+    list.insertAdjacentHTML('beforeend', markup);
+    lightbox.refresh();
 }
 
 export function clearGallery(){
-    const list = document.querySelector('.gallery')
-        return list.innerHTML = ''
-}
-
-export function refreshLitBox(){
-    lightbox.refresh()
+    list.innerHTML = '';
 }
 
 export function showLoader(){
-    loader.classList.remove('is-hidden')
+    loader.classList.remove('is-hidden');
 }
 
 export function hideLoader(){
-    loader.classList.add('is-hidden')
+    loader.classList.add('is-hidden');
 }

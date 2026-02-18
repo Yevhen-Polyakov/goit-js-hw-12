@@ -16,7 +16,7 @@ async function handleSubmit(e) {
     e.preventDefault();
     const input = e.target.elements['search-text'].value.trim();
 
-    if (!input.length) {
+    if (input.length === 0) {
         iziToast.error({
             message: 'Please enter a search query.',
         });
@@ -24,6 +24,7 @@ async function handleSubmit(e) {
     }
 
     clearGallery();
+    hideLoadMoreButton(); 
     showLoader();
     currentQuery = input;
     currentPage = 1;
@@ -33,21 +34,25 @@ async function handleSubmit(e) {
         const images = data.hits || [];
         const totalPages = Math.ceil(data.totalHits / PER_PAGE);
 
-        if (!images.length) {
+        if (images.length === 0) {
+            hideLoadMoreButton();
             iziToast.error({
-                message: 'Sorry, there are no images matching your search query. Please try again!',
+                message: "We're sorry, но you' ve reached the end  of  search results."
             });
-            hideLoadMoreButton();
-            return;
-        }
+            return
+        } 
+            createGallery(images);
 
-        createGallery(images);
-
-        if (totalPages > 1) {
-            showLoadMoreButton();
-        } else {
-            hideLoadMoreButton();
-        }
+            if (totalPages === 1) {
+                hideLoadMoreButton();
+                iziToast.error({
+                    message: "We're sorry, но you' ve reached the end  of  search results."
+                });
+                return
+            } 
+                showLoadMoreButton();
+            
+        
     } catch (error) {
         iziToast.error({
             message: 'Something went wrong. Please try again later.',
@@ -64,36 +69,41 @@ loadBtn.addEventListener("click", loadSubmit)
 async function loadSubmit(e) {
     e.preventDefault();
     currentPage += 1;
+    hideLoadMoreButton(); 
     showLoader();
+
     try {
         const data = await getImagesByQuery(currentQuery, currentPage, PER_PAGE);
         const images = data.hits || [];
         const totalPages = Math.ceil(data.totalHits / PER_PAGE);
 
-        if (!images.length || currentPage >= totalPages) {
+        if (images.length === 0) {
+            hideLoadMoreButton();
             iziToast.error({
                 message: "We're sorry, но you' ve reached the end  of  search results."
             });
-            hideLoadMoreButton();
-            return;
-        }
+            return
+        }  
+            createGallery(images);
 
-        createGallery(images);
-
-        const firstCard = document.querySelector('.item-gallery');
-        if (firstCard) {
-            const { height: cardHeight } = firstCard.getBoundingClientRect();
-            window.scrollBy({
-                top: cardHeight * 2,
-                behavior: 'smooth'
-            });
-        }
-
-        if (currentPage < totalPages) {
-            showLoadMoreButton();
-        } else {
-            hideLoadMoreButton();
-        }
+            const firstCard = document.querySelector('.item-gallery');
+            if (firstCard) {
+                const { height: cardHeight } = firstCard.getBoundingClientRect();
+                window.scrollBy({
+                    top: cardHeight * 2,
+                    behavior: 'smooth'
+                });
+            }
+            if (currentPage >= totalPages) {
+                hideLoadMoreButton();
+                iziToast.error({
+                    message: "We're sorry, но you' ve reached the end  of  search results."
+                });
+                return
+            }  
+                showLoadMoreButton();
+            
+        
     } catch (error) {
         iziToast.error({
             message: 'Something went wrong. Please try again later.'
